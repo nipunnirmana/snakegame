@@ -1,44 +1,47 @@
 var gameCanvasID = 'game';
 var gH = 500;
 var gW = 500;
-var bW = 30;
-var bH = 30;
+var bW = 20;
+var bH = 20;
 var xPos = 0;
 var yPos = 0;
-var ctx;
+var ctx , flowDirection;
+var speed = 100; // in ms
 
 function initGame() {
   var game = document.getElementById(gameCanvasID);
   ctx = game.getContext("2d");
   game.height = gH;
   game.width = gW;
-  moveBox(xPos,yPos);
+  moveBox();
+  flow(39);
 }
 
-function moveBox(x,y) {
-  xPos = x ;
-  yPos = y;
+function moveBox(direction) {
+
   ctx.clearRect(0, 0, gW, gH);
-  ctx.fillRect(x,y,bW,bH);
+  if (direction === 37) (xPos-bH < 0) ? xPos = gW-bW : xPos = xPos-bW ; // LEFT
+  if (direction === 38) (yPos-bW < 0) ? yPos = gH-bH : yPos = yPos-bH ; // UP
+  if (direction === 39) (xPos+bH > gW-bW) ? xPos = 0 : xPos = xPos+bW; // RIGHT
+  if (direction === 40) (yPos+bH > gH-bH) ? yPos = 0 : yPos = yPos+bH ; // DOWN
+
+  ctx.clearRect(0, 0, gW, gH);
+  ctx.fillRect(xPos,yPos,bW,bH);
+
+}
+
+function flow(code) {
+  clearInterval(flowDirection);
+
+  flowDirection = setInterval(function functionName() {
+    moveBox(code);
+  },speed);
 }
 
 
 document.addEventListener('keydown',function (e) {
-  switch (e.keyCode) {
-    case 37: // LEFT
-    (xPos-bH < 0) ? moveBox(gW-bW,yPos) : moveBox(xPos-bW,yPos) ;
-    break;
-    case 38: // UP
-    (yPos-bW < 0) ? moveBox(xPos,gH-bH) : moveBox(xPos,yPos-bH) ;
-    break;
-    case 39: // RIGHT
-    (xPos+bH > gW-bW) ? moveBox(0,yPos) : moveBox(xPos+bW,yPos);
-    break;
-    case 40: // DOWN
-    (yPos+bH > gH-bH) ? moveBox(xPos,0) : moveBox(xPos,yPos+bH) ;
-    break;
-  }
-
+  moveBox(e.keyCode);
+  flow(e.keyCode);
 });
 
 initGame();
